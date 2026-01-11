@@ -2,22 +2,22 @@
 
 > ⚠️ **Early Draft** — This is an experimental setup. May require adjustments for your system. Tested on Linux only; macOS is untested.
 
-CIDER-like Clojure/ClojureScript development environment for Zed editor.
+Clojure/ClojureScript development environment for Zed editor using [rebel-readline](https://github.com/bhauman/rebel-readline).
 
 ![Screenshot](screenshot.png)
 
 ## How It Works
 
-1. **Start Rebel REPL** (`Ctrl+C Ctrl+R`) — launches rebel-readline with embedded nREPL server
+1. **Start REPL** (`Ctrl+C Ctrl+R`) — launches rebel-readline with embedded nREPL server
 2. **Eval code** (`Ctrl+X Ctrl+E`) — sends selected code to nREPL
-3. **See results in Rebel** — eval results appear in REPL via `tap>`, no separate windows
+3. **See results in REPL** — eval results appear in REPL via `tap>`, no separate windows
 
 All eval commands share the same nREPL session. The `.nrepl-port` file is created automatically.
 
 ## Features
 
-- **Auto-start nREPL** — Rebel REPL starts embedded nREPL if none running
-- **Results in REPL** — eval results appear in Rebel via tap>
+- **Auto-start nREPL** — REPL starts embedded nREPL if none running
+- **Results in REPL** — eval results appear in REPL via tap>
 - **Rich REPL** — [rebel-readline](https://github.com/bhauman/rebel-readline) with TAB completion, syntax highlighting, history
 - **ClojureScript** — shadow-cljs support (parallel to Clojure REPL)
 
@@ -40,14 +40,14 @@ Restart Zed after installation.
 ## Quick Start
 
 1. Open any `.clj` file in Zed
-2. Press `Ctrl+C Ctrl+R` — starts Rebel REPL with nREPL
-3. Select code, press `Ctrl+X Ctrl+E` — result appears in Rebel
+2. Press `Ctrl+C Ctrl+R` — starts REPL with nREPL
+3. Select code, press `Ctrl+X Ctrl+E` — result appears in REPL
 
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+C Ctrl+R` | Start Rebel REPL (auto-starts nREPL) |
+| `Ctrl+C Ctrl+R` | Start REPL (auto-starts nREPL) |
 | `Ctrl+X Ctrl+E` | Eval selection |
 | `Ctrl+C Ctrl+C` | Eval form at point |
 | `Ctrl+C Ctrl+K` | Eval buffer |

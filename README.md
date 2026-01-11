@@ -1,5 +1,7 @@
 # Zed Clojure REPL
 
+> ⚠️ **Early Draft** — This is an experimental setup. May require adjustments for your system. Tested on Linux; macOS support is untested.
+
 CIDER-like Clojure/ClojureScript development environment for Zed editor.
 
 ![Screenshot](screenshot.png)
@@ -23,11 +25,12 @@ All eval commands share the same nREPL session. The `.nrepl-port` file is create
 
 - [Zed editor](https://zed.dev)
 - [Clojure CLI](https://clojure.org/guides/install_clojure)
+- `nc` (netcat) — for port checking
 
 ## Installation
 
 ```bash
-git clone https://github.com/example/zed-clojure-repl.git
+git clone https://github.com/psychedel/zed-clojure-repl.git
 cd zed-clojure-repl
 ./install.sh
 ```

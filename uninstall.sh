@@ -2,34 +2,39 @@
 # Zed Clojure REPL - Uninstall Script
 
 INSTALL_DIR="$HOME/.zed-clojure-repl"
-ZED_CONFIG="$HOME/.config/zed"
+
+# Detect Zed config location (macOS vs Linux)
+if [ "$(uname)" = "Darwin" ]; then
+    ZED_CONFIG="$HOME/Library/Application Support/Zed"
+else
+    ZED_CONFIG="$HOME/.config/zed"
+fi
 
 echo "=== Zed Clojure REPL Uninstaller ==="
 echo ""
 
 # Remove install directory
 if [ -d "$INSTALL_DIR" ]; then
-    echo "Will remove: $INSTALL_DIR"
+    echo "Removing: $INSTALL_DIR"
     rm -rf "$INSTALL_DIR"
-    echo "  Removed"
+    echo "  Done"
 else
     echo "Install directory not found (already removed?)"
 fi
 
 # Clean up temporary config files created by installer
-if [ -f "$ZED_CONFIG/tasks.clojure.json" ]; then
-    rm "$ZED_CONFIG/tasks.clojure.json"
-    echo "Removed tasks.clojure.json"
-fi
-
-if [ -f "$ZED_CONFIG/keymap.clojure.json" ]; then
-    rm "$ZED_CONFIG/keymap.clojure.json"
-    echo "Removed keymap.clojure.json"
-fi
+for f in "$ZED_CONFIG/tasks.clojure.json" "$ZED_CONFIG/keymap.clojure.json"; do
+    if [ -f "$f" ]; then
+        rm "$f"
+        echo "Removed: $(basename "$f")"
+    fi
+done
 
 echo ""
 echo "Uninstall complete."
 echo ""
-echo "NOTE: If you want to remove Clojure tasks/keybindings from Zed,"
-echo "manually edit ~/.config/zed/tasks.json and keymap.json"
-echo "to remove entries containing 'Clojure:' or 'ClojureScript:'"
+echo "NOTE: Clojure tasks/keybindings remain in Zed config."
+echo "To remove them, edit these files manually:"
+echo "  $ZED_CONFIG/tasks.json"
+echo "  $ZED_CONFIG/keymap.json"
+echo "Remove entries containing 'Clojure:' or 'ClojureScript:'"

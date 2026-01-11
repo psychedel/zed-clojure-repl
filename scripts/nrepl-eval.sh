@@ -21,6 +21,14 @@ find_port() {
     echo ""
 }
 
+# Extract first symbol from expression like "(+ 2 3)" -> "+"
+extract_symbol() {
+    local input="$1"
+    # Remove leading whitespace and opening parens/brackets
+    local cleaned=$(echo "$input" | sed 's/^[[:space:]]*[([\{#'\''`~@]*//; s/[[:space:]].*$//')
+    echo "$cleaned"
+}
+
 EXPLICIT_PORT=""
 USE_CLJS=false
 
@@ -38,8 +46,14 @@ case "$1" in
     -f|--file) CODE="(load-file \"$2\")" ;;
     -r|--reload) CODE="(require '[$2] :reload)" ;;
     -t|--test) CODE="(do (require 'clojure.test) (require '[$2] :reload) (clojure.test/run-tests '$2))" ;;
-    -d|--doc) CODE="(do (require 'clojure.repl) (clojure.repl/doc $2))" ;;
-    -s|--source) CODE="(do (require 'clojure.repl) (clojure.repl/source $2))" ;;
+    -d|--doc)
+        SYM=$(extract_symbol "$2")
+        CODE="(do (require 'clojure.repl) (clojure.repl/doc $SYM))"
+        ;;
+    -s|--source)
+        SYM=$(extract_symbol "$2")
+        CODE="(do (require 'clojure.repl) (clojure.repl/source $SYM))"
+        ;;
     -a|--apropos) CODE="(do (require 'clojure.repl) (clojure.repl/apropos \"$2\"))" ;;
     -e|--pst) CODE="(do (require 'clojure.repl) (clojure.repl/pst))" ;;
     --dir) CODE="(do (require 'clojure.repl) (clojure.repl/dir $2))" ;;
@@ -54,8 +68,8 @@ Usage:
   nrepl-eval.sh -f <file.clj>      Load file
   nrepl-eval.sh -r <ns>            Reload namespace
   nrepl-eval.sh -t <ns>            Run tests
-  nrepl-eval.sh -d <symbol>        Show documentation
-  nrepl-eval.sh -s <symbol>        Show source
+  nrepl-eval.sh -d <symbol>        Show documentation (extracts symbol from expression)
+  nrepl-eval.sh -s <symbol>        Show source (extracts symbol from expression)
   nrepl-eval.sh -a <pattern>       Apropos search
   nrepl-eval.sh -e                 Print last exception
   nrepl-eval.sh --cljs '<code>'    Eval in shadow-cljs

@@ -2,7 +2,7 @@
 
 > ⚠️ **Early Draft** — This is an experimental setup. May require adjustments for your system. Tested on Linux only; macOS is untested.
 
-Clojure/ClojureScript development environment for Zed editor using [rebel-readline](https://github.com/bhauman/rebel-readline).
+Clojure/ClojureScript development environment for Zed editor using [rebel-readline](https://github.com/bhauman/rebel-readline) and [Portal](https://github.com/djblue/portal).
 
 ![Screenshot](screenshot.png)
 

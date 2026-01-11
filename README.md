@@ -47,7 +47,8 @@ Restart Zed after installation.
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+C Ctrl+R` | Start REPL (auto-starts nREPL) |
+| `Ctrl+C Ctrl+R` | Start Clojure REPL |
+| `Ctrl+C Ctrl+J` | Start ClojureScript REPL (shadow-cljs) |
 | `Ctrl+X Ctrl+E` | Eval selection |
 | `Ctrl+C Ctrl+C` | Eval form at point |
 | `Ctrl+C Ctrl+K` | Eval buffer |

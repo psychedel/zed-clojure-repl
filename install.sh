@@ -12,7 +12,7 @@ echo ""
 
 # Check dependencies
 echo "Checking dependencies..."
-command -v clojure >/dev/null 2>&1 || { echo "Error: Clojure CLI not found. Install from https://clojure.org/guides/install_clojure"; exit 1; }
+command -v clojure >/dev/null 2>&1 || { echo "Error: Clojure CLI required. Install: https://clojure.org/guides/install_clojure"; exit 1; }
 echo "  clojure: OK"
 
 # Create install directory
@@ -22,24 +22,22 @@ mkdir -p "$INSTALL_DIR/scripts"
 cp "$SCRIPT_DIR/scripts/"* "$INSTALL_DIR/scripts/"
 chmod +x "$INSTALL_DIR/scripts/"*.sh
 
-# Backup and merge Zed config
+# Configure Zed
 echo ""
 echo "Configuring Zed..."
 mkdir -p "$ZED_CONFIG"
 
+NEED_MANUAL=false
+
 # Tasks
 if [ -f "$ZED_CONFIG/tasks.json" ]; then
-    echo "  tasks.json exists - backing up to tasks.json.bak"
-    cp "$ZED_CONFIG/tasks.json" "$ZED_CONFIG/tasks.json.bak"
-    echo "  Merging Clojure tasks..."
-    # Simple merge: append our tasks if not already present
     if grep -q "Clojure: Eval Selection" "$ZED_CONFIG/tasks.json"; then
-        echo "  Clojure tasks already present - skipping"
+        echo "  tasks.json: Clojure tasks already present"
     else
-        # Remove closing bracket, append our tasks, close bracket
-        sed -i '$ d' "$ZED_CONFIG/tasks.json"
-        echo "," >> "$ZED_CONFIG/tasks.json"
-        tail -n +2 "$SCRIPT_DIR/config/tasks.json" >> "$ZED_CONFIG/tasks.json"
+        echo "  tasks.json: exists with other tasks"
+        cp "$SCRIPT_DIR/config/tasks.json" "$ZED_CONFIG/tasks.clojure.json"
+        echo "  Created tasks.clojure.json - merge manually"
+        NEED_MANUAL=true
     fi
 else
     cp "$SCRIPT_DIR/config/tasks.json" "$ZED_CONFIG/tasks.json"
@@ -48,14 +46,13 @@ fi
 
 # Keymap
 if [ -f "$ZED_CONFIG/keymap.json" ]; then
-    echo "  keymap.json exists - backing up to keymap.json.bak"
-    cp "$ZED_CONFIG/keymap.json" "$ZED_CONFIG/keymap.json.bak"
     if grep -q "Clojure: Eval Selection" "$ZED_CONFIG/keymap.json"; then
-        echo "  Clojure keybindings already present - skipping"
+        echo "  keymap.json: Clojure bindings already present"
     else
-        sed -i '$ d' "$ZED_CONFIG/keymap.json"
-        echo "," >> "$ZED_CONFIG/keymap.json"
-        tail -n +2 "$SCRIPT_DIR/config/keymap.json" >> "$ZED_CONFIG/keymap.json"
+        echo "  keymap.json: exists with other bindings"
+        cp "$SCRIPT_DIR/config/keymap.json" "$ZED_CONFIG/keymap.clojure.json"
+        echo "  Created keymap.clojure.json - merge manually"
+        NEED_MANUAL=true
     fi
 else
     cp "$SCRIPT_DIR/config/keymap.json" "$ZED_CONFIG/keymap.json"
@@ -64,16 +61,25 @@ fi
 
 echo ""
 echo "=== Installation Complete ==="
+
+if [ "$NEED_MANUAL" = true ]; then
+    echo ""
+    echo "MANUAL STEPS REQUIRED:"
+    echo "  Merge contents of tasks.clojure.json into tasks.json"
+    echo "  Merge contents of keymap.clojure.json into keymap.json"
+    echo "  Then delete the .clojure.json files"
+fi
+
 echo ""
 echo "Quick start:"
-echo "  1. Start nREPL in your project: lein repl :headless"
-echo "  2. Open a .clj file in Zed"
-echo "  3. Select code and press Ctrl+X Ctrl+E to evaluate"
+echo "  1. Start nREPL: lein repl :headless"
+echo "  2. Open .clj file in Zed"
+echo "  3. Select code, press Ctrl+X Ctrl+E"
 echo ""
 echo "Key bindings:"
 echo "  Ctrl+X Ctrl+E  - Eval selection"
 echo "  Ctrl+C Ctrl+C  - Eval form at cursor"
 echo "  Ctrl+C Ctrl+K  - Eval buffer"
-echo "  Ctrl+C Ctrl+D  - Show documentation"
+echo "  Ctrl+C Ctrl+D  - Documentation"
 echo "  Ctrl+C Ctrl+T  - Run tests"
 echo ""

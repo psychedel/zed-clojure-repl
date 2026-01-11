@@ -22,11 +22,10 @@ find_port() {
 }
 
 # Extract first symbol from expression like "(+ 2 3)" -> "+"
+# Handles multiline input by taking first line only
 extract_symbol() {
     local input="$1"
-    # Remove leading whitespace and opening parens/brackets
-    local cleaned=$(echo "$input" | sed 's/^[[:space:]]*[([\{#'\''`~@]*//; s/[[:space:]].*$//')
-    echo "$cleaned"
+    echo "$input" | head -1 | sed 's/^[[:space:]]*[([\{#'\''`~@]*//; s/[[:space:]].*$//'
 }
 
 EXPLICIT_PORT=""

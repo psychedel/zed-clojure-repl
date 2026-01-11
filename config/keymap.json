@@ -5,6 +5,7 @@
       "ctrl-c s": ["task::Spawn", {"task_name": "Clojure: Check Status"}],
       "ctrl-c ctrl-r": ["task::Spawn", {"task_name": "Clojure: Start Rebel REPL"}],
       "ctrl-c ctrl-b": ["task::Spawn", {"task_name": "ClojureScript: Start Shadow-cljs"}],
+      "ctrl-c ctrl-j": ["task::Spawn", {"task_name": "ClojureScript: Start Rebel REPL"}],
       "ctrl-c ctrl-l": ["task::Spawn", {"task_name": "ClojureScript: Init REPL"}]
     }
   },

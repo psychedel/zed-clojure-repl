@@ -36,25 +36,30 @@ git clone https://github.com/piotrklibert/zed-clojure-repl ~/.zed-clojure-repl
 | Key | Action |
 |-----|--------|
 | `Ctrl+C Ctrl+B` | Start shadow-cljs watch |
-| `Ctrl+C Ctrl+L` | Init ClojureScript REPL |
+| `Ctrl+C Ctrl+J` | Start Rebel REPL (for viewing results) |
+| `Ctrl+C Ctrl+L` | Init ClojureScript session |
 | `Ctrl+X Ctrl+D` | Eval selection |
 
 ## ClojureScript Setup
 
-1. Start shadow-cljs: `Ctrl+C Ctrl+B`
+1. `Ctrl+C Ctrl+B` — Start shadow-cljs watch
 2. Open your app in browser (connects JS runtime)
-3. Init CLJS session: `Ctrl+C Ctrl+L` — enter build id (e.g., `app`)
-4. Eval code: `Ctrl+X Ctrl+D`
+3. `Ctrl+C Ctrl+J` — Start Rebel REPL (to see eval results via tap>)
+4. `Ctrl+C Ctrl+L` — Init ClojureScript session (enter build id, e.g., `game`)
+5. `Ctrl+X Ctrl+D` — Eval code (results appear in Rebel)
 
 The build id is saved to `.zed-repl` for future use:
 ```
-cljs-build=app
+cljs-build=game
 ```
 
 ## How it Works
 
 - **Clojure**: Rebel REPL starts embedded nREPL. Evals from Zed go through nREPL and appear in REPL via `tap>`.
-- **ClojureScript**: `cljs-init.sh` creates nREPL session, runs `(shadow/repl :build)`, saves session to `.zed-cljs-session`. Subsequent evals use this session.
+- **ClojureScript**: 
+  1. Rebel connects to shadow-cljs nREPL and listens for `tap>` 
+  2. `cljs-init.sh` creates a separate session, switches to CLJS REPL
+  3. Evals from Zed use this session and send results via `tap>` to Rebel
 
 ## Requirements
 

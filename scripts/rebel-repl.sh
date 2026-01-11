@@ -63,9 +63,43 @@ if [ "$USE_CLJS" = true ]; then
         echo "Start shadow-cljs first: npx shadow-cljs watch <build>"
         exit 1
     fi
+    
     echo -e "${CYAN}Connecting to shadow-cljs nREPL on port $PORT...${NC}"
+    echo ""
+    echo "To start ClojureScript REPL, run:"
+    echo "  (zed/cljs :your-build)"
+    echo ""
+    echo "This will switch to CLJS and save session for Zed evals."
+    echo "Eval results from Zed will appear here via tap>"
+    echo ""
+    
+    # Inject zed/cljs helper before starting rebel
+    INIT_CODE='
+(do
+  (ns zed)
+  (defn cljs
+    "Switch to ClojureScript REPL and save session for Zed.
+     Usage: (zed/cljs :app)"
+    [build-id]
+    (require (quote shadow.cljs.devtools.api))
+    ;; Get session-id by sending a describe op and checking response
+    ;; For now, we create a marker file and let nrepl-client clone from here
+    (spit ".zed-cljs-ready" (str build-id))
+    ((resolve (quote shadow.cljs.devtools.api/repl)) build-id))
+  
+  ;; Add tap listener
+  (add-tap (fn [x]
+             (println "")
+             (print "\033[36m;; => \033[0m")
+             (clojure.pprint/pprint x)
+             (flush)))
+  
+  (in-ns (quote user))
+  nil)
+'
+    
     exec clojure -Sdeps "{:deps {com.bhauman/rebel-readline-nrepl {:mvn/version \"$REBEL_VERSION\"}}}" \
-        -M -m rebel-readline.nrepl.main --port "$PORT"
+        -M -e "$INIT_CODE" -m rebel-readline.nrepl.main --port "$PORT"
 fi
 
 # Clojure mode
@@ -106,7 +140,7 @@ read -r -d '' STARTUP_CODE << 'CLOJURE' || true
   (println "")
 
   ;; Add tap listener to show eval results from Zed
-  (add-tap (fn [x] 
+  (add-tap (fn [x]
              (println "")
              (print "\033[36m;; => \033[0m")
              (prn x)

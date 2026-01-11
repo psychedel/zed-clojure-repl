@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # nREPL client for Zed - sends code to running nREPL
-# For ClojureScript: uses --session to maintain cljs context per-project
+# For ClojureScript: uses session from .zed-cljs-session
 
 set -e
 
@@ -10,12 +10,21 @@ RED='\033[0;31m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+find_project_root() {
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        [ -f "$dir/shadow-cljs.edn" ] || [ -f "$dir/deps.edn" ] || [ -f "$dir/project.clj" ] && echo "$dir" && return 0
+        dir="$(dirname "$dir")"
+    done
+    echo "$PWD"
+}
+
 find_port() {
     local port_type="${1:-clj}"
     local dir="$PWD"
     while [ "$dir" != "/" ]; do
         if [ "$port_type" = "cljs" ]; then
-            [ -f "$dir/.shadow-cljs/nrepl.port" ] && echo "$dir/.shadow-cljs/nrepl.port" && return 0
+            [ -f "$dir/.shadow-cljs/nrepl.port" ] && cat "$dir/.shadow-cljs/nrepl.port" && return 0
         else
             [ -f "$dir/.nrepl-port" ] && cat "$dir/.nrepl-port" && return 0
         fi
@@ -25,56 +34,13 @@ find_port() {
     echo ""
 }
 
-find_shadow_root() {
+find_cljs_session() {
     local dir="$PWD"
     while [ "$dir" != "/" ]; do
-        [ -f "$dir/shadow-cljs.edn" ] && echo "$dir" && return 0
+        [ -f "$dir/.zed-cljs-session" ] && echo "$dir/.zed-cljs-session" && return 0
         dir="$(dirname "$dir")"
     done
     echo ""
-}
-
-find_cljs_build() {
-    local shadow_root="$1"
-    [ -z "$shadow_root" ] && echo "app" && return
-    
-    local edn_file="$shadow_root/shadow-cljs.edn"
-    [ ! -f "$edn_file" ] && echo "app" && return
-    
-    # Find :builds line, then extract build ids (lines with 1-2 space indent + :keyword)
-    local builds_line
-    builds_line=$(grep -n "^ *:builds" "$edn_file" 2>/dev/null | head -1 | cut -d: -f1)
-    
-    if [ -n "$builds_line" ]; then
-        local build
-        build=$(awk -v start="$builds_line" 'NR > start && /^[[:space:]]{1,2}:[a-zA-Z]/ { 
-            gsub(/^[[:space:]]+/, ""); 
-            gsub(/[[:space:]].*/, ""); 
-            gsub(":", ""); 
-            print; exit
-        }' "$edn_file")
-        [ -n "$build" ] && echo "$build" && return
-    fi
-    
-    echo "app"
-}
-
-get_session_file() {
-    local shadow_root="$1"
-    if [ -n "$shadow_root" ]; then
-        # Use hash of path for unique session file per project
-        local hash
-        if command -v md5sum >/dev/null 2>&1; then
-            hash=$(echo "$shadow_root" | md5sum | cut -c1-8)
-        elif command -v md5 >/dev/null 2>&1; then
-            hash=$(echo "$shadow_root" | md5 | cut -c1-8)
-        else
-            hash=$(echo "$shadow_root" | cksum | cut -d' ' -f1)
-        fi
-        echo "$HOME/.zed-cljs-session-$hash"
-    else
-        echo "$HOME/.zed-cljs-session"
-    fi
 }
 
 check_port_alive() {
@@ -86,19 +52,6 @@ check_port_alive() {
 extract_symbol() {
     local input="$1"
     echo "$input" | head -1 | sed 's/^[[:space:]]*[([\{#'\''`~@]*//; s/[[:space:]].*$//'
-}
-
-print_no_repl_error() {
-    local repl_type="$1"
-    if [ "$repl_type" = "cljs" ]; then
-        echo -e "${RED}Error: No shadow-cljs nREPL found${NC}"
-        echo ""
-        echo "Start shadow-cljs first with Ctrl+C Ctrl+B"
-    else
-        echo -e "${RED}Error: No nREPL server found${NC}"
-        echo ""
-        echo "Start the REPL first with Ctrl+C Ctrl+R"
-    fi
 }
 
 EXPLICIT_PORT=""
@@ -114,15 +67,16 @@ while [[ "$1" =~ ^- ]]; do
     esac
 done
 
+# Determine port
 if [ -n "$EXPLICIT_PORT" ]; then
     PORT="$EXPLICIT_PORT"
 elif [ "$USE_CLJS" = true ]; then
-    PORT_FILE=$(find_port cljs)
-    [ -n "$PORT_FILE" ] && PORT=$(cat "$PORT_FILE") || PORT=""
+    PORT=$(find_port cljs)
 else
     PORT=$(find_port clj)
 fi
 
+# Commands that shouldn't use tap>
 NO_TAP_COMMANDS=false
 
 case "$1" in
@@ -141,26 +95,37 @@ esac
 
 [ -z "$CODE" ] && echo "Usage: nrepl-eval.sh [--cljs] '<code>'" && exit 1
 
+# Check port
 if [ -z "$PORT" ]; then
-    [ "$USE_CLJS" = true ] && print_no_repl_error "cljs" || print_no_repl_error "clj"
+    if [ "$USE_CLJS" = true ]; then
+        echo -e "${RED}Error: No shadow-cljs nREPL found${NC}"
+        echo "Start shadow-cljs first with Ctrl+C Ctrl+B"
+    else
+        echo -e "${RED}Error: No nREPL server found${NC}"
+        echo "Start the REPL first with Ctrl+C Ctrl+R"
+    fi
     exit 1
 fi
 
 if ! check_port_alive "$PORT"; then
     echo -e "${YELLOW}nREPL port $PORT not responding${NC}"
-    [ "$USE_CLJS" = true ] && print_no_repl_error "cljs" || print_no_repl_error "clj"
     exit 1
 fi
 
+# Wrap in tap> for visibility in Rebel REPL
 if [ "$USE_TAP" = true ] && [ "$NO_TAP_COMMANDS" = false ]; then
     CODE="(tap> (do $CODE))"
 fi
 
+# For ClojureScript, use session file
 if [ "$USE_CLJS" = true ]; then
-    SHADOW_ROOT=$(find_shadow_root)
-    BUILD=$(find_cljs_build "$SHADOW_ROOT")
-    SESSION_FILE=$(get_session_file "$SHADOW_ROOT")
-    exec clojure -M "$SCRIPT_DIR/nrepl-client.clj" "$PORT" --session "$SESSION_FILE" --init-cljs "$BUILD" "$CODE"
+    SESSION_FILE=$(find_cljs_session)
+    if [ -z "$SESSION_FILE" ]; then
+        echo -e "${RED}Error: No ClojureScript session found${NC}"
+        echo "Initialize first with Ctrl+C Ctrl+L"
+        exit 1
+    fi
+    exec clojure -M "$SCRIPT_DIR/nrepl-client.clj" "$PORT" --session "$SESSION_FILE" "$CODE"
 else
     exec clojure -M "$SCRIPT_DIR/nrepl-client.clj" "$PORT" "$CODE"
 fi

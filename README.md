@@ -26,15 +26,18 @@ git clone https://github.com/piotrklibert/zed-clojure-repl ~/.zed-clojure-repl
 | Key | Action |
 |-----|--------|
 | `Ctrl+C Ctrl+R` | Start Rebel REPL |
-| `Ctrl+X Ctrl+E` | Eval selection/form |
-| `Ctrl+X Ctrl+B` | Eval buffer |
+| `Ctrl+X Ctrl+E` | Eval selection |
+| `Ctrl+C Ctrl+C` | Eval form at point |
+| `Ctrl+C Ctrl+K` | Eval buffer |
+| `Ctrl+C Ctrl+D` | Show documentation |
+| `Ctrl+C Ctrl+O` | Start Portal |
 
 ### ClojureScript
 | Key | Action |
 |-----|--------|
 | `Ctrl+C Ctrl+B` | Start shadow-cljs watch |
 | `Ctrl+C Ctrl+L` | Init ClojureScript REPL |
-| `Ctrl+X Ctrl+D` | Eval selection (ClojureScript) |
+| `Ctrl+X Ctrl+D` | Eval selection |
 
 ## ClojureScript Setup
 

@@ -69,21 +69,19 @@ if [ "$USE_CLJS" = true ]; then
     echo "To start ClojureScript REPL, run:"
     echo "  (zed/cljs :your-build)"
     echo ""
-    echo "This will switch to CLJS and save session for Zed evals."
     echo "Eval results from Zed will appear here via tap>"
     echo ""
     
-    # Inject zed/cljs helper before starting rebel
     INIT_CODE='
 (do
+  (require (quote clojure.pprint))
+  
   (ns zed)
   (defn cljs
     "Switch to ClojureScript REPL and save session for Zed.
      Usage: (zed/cljs :app)"
     [build-id]
     (require (quote shadow.cljs.devtools.api))
-    ;; Get session-id by sending a describe op and checking response
-    ;; For now, we create a marker file and let nrepl-client clone from here
     (spit ".zed-cljs-ready" (str build-id))
     ((resolve (quote shadow.cljs.devtools.api/repl)) build-id))
   

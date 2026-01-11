@@ -18,7 +18,7 @@ All eval commands share the same nREPL session. The `.nrepl-port` file is create
 
 - **Auto-start nREPL** — Rebel REPL starts embedded nREPL if none running
 - **Results in REPL** — eval results appear in Rebel via tap>
-- **Rich REPL** — rebel-readline with TAB completion, syntax highlighting, history
+- **Rich REPL** — [rebel-readline](https://github.com/bhauman/rebel-readline) with TAB completion, syntax highlighting, history
 - **ClojureScript** — shadow-cljs support (parallel to Clojure REPL)
 
 ## Requirements

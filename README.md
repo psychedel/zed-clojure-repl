@@ -1,6 +1,8 @@
 # Zed Clojure REPL
 
-CIDER-like Clojure development for [Zed editor](https://zed.dev) via nREPL.
+> ⚠️ **Early draft** — work in progress, expect rough edges
+
+Clojure REPL integration for Zed via Tasks — eval, docs, tests, [Portal](https://github.com/djblue/portal).
 
 ## Features
 
@@ -9,8 +11,8 @@ CIDER-like Clojure development for [Zed editor](https://zed.dev) via nREPL.
 - **Eval buffer** (`Ctrl+C Ctrl+K`)
 - **Reload namespace** (`Ctrl+C Ctrl+N`)
 - **Run tests** (`Ctrl+C Ctrl+T`)
-- **Documentation lookup** (`Ctrl+C Ctrl+D`)
-- **Portal data inspector** integration
+- **Documentation lookup** (`Ctrl+C Ctrl+D`) — works with full expressions
+- **[Portal](https://github.com/djblue/portal) data inspector** integration
 - **ClojureScript** support (shadow-cljs)
 
 ## Requirements
@@ -64,7 +66,7 @@ Restart Zed after installation.
 
 ## Portal Integration
 
-Add Portal to your project:
+Add [Portal](https://github.com/djblue/portal) to your project:
 
 ```clojure
 ;; deps.edn

@@ -4,6 +4,7 @@
     "bindings": {
       "ctrl-c s": ["task::Spawn", {"task_name": "Clojure: Check Status"}],
       "ctrl-c ctrl-r": ["task::Spawn", {"task_name": "Clojure: Start Rebel REPL"}],
+      "ctrl-c ctrl-b": ["task::Spawn", {"task_name": "ClojureScript: Start Shadow-cljs"}],
       "ctrl-c ctrl-l": ["task::Spawn", {"task_name": "ClojureScript: Start Rebel REPL"}]
     }
   },
@@ -21,7 +22,8 @@
       "ctrl-c ctrl-e": ["task::Spawn", {"task_name": "Clojure: Last Exception"}],
       "ctrl-c ctrl-m": ["task::Spawn", {"task_name": "Clojure: Macroexpand"}],
       "ctrl-c ctrl-o": ["task::Spawn", {"task_name": "Clojure: Start Portal"}],
-      "ctrl-c ctrl-p": ["task::Spawn", {"task_name": "Clojure: Tap to Portal"}]
+      "ctrl-c ctrl-p": ["task::Spawn", {"task_name": "Clojure: Tap to Portal"}],
+      "ctrl-x ctrl-d": ["task::Spawn", {"task_name": "ClojureScript: Eval Selection"}]
     }
   },
   {

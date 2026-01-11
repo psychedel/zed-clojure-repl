@@ -48,7 +48,8 @@ Restart Zed after installation.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+C Ctrl+R` | Start Clojure REPL |
-| `Ctrl+C Ctrl+L` | Start ClojureScript REPL (shadow-cljs) |
+| `Ctrl+C Ctrl+B` | Start shadow-cljs watch |
+| `Ctrl+C Ctrl+L` | Connect to ClojureScript REPL |
 | `Ctrl+X Ctrl+E` | Eval selection |
 | `Ctrl+C Ctrl+C` | Eval form at point |
 | `Ctrl+C Ctrl+K` | Eval buffer |
@@ -66,7 +67,7 @@ Start shadow-cljs separately:
 npx shadow-cljs watch app
 ```
 
-Then `Ctrl+C Ctrl+L` connects to shadow-cljs REPL.
+Use `Ctrl+C Ctrl+B` to start shadow-cljs, then `Ctrl+C Ctrl+L` to connect REPL.
 
 ## Uninstall
 

@@ -9,20 +9,27 @@ echo ""
 
 # Remove install directory
 if [ -d "$INSTALL_DIR" ]; then
+    echo "Will remove: $INSTALL_DIR"
     rm -rf "$INSTALL_DIR"
-    echo "Removed $INSTALL_DIR"
+    echo "  Removed"
+else
+    echo "Install directory not found (already removed?)"
 fi
 
-# Restore backups if they exist
-if [ -f "$ZED_CONFIG/tasks.json.bak" ]; then
-    mv "$ZED_CONFIG/tasks.json.bak" "$ZED_CONFIG/tasks.json"
-    echo "Restored tasks.json from backup"
+# Clean up temporary config files created by installer
+if [ -f "$ZED_CONFIG/tasks.clojure.json" ]; then
+    rm "$ZED_CONFIG/tasks.clojure.json"
+    echo "Removed tasks.clojure.json"
 fi
 
-if [ -f "$ZED_CONFIG/keymap.json.bak" ]; then
-    mv "$ZED_CONFIG/keymap.json.bak" "$ZED_CONFIG/keymap.json"
-    echo "Restored keymap.json from backup"
+if [ -f "$ZED_CONFIG/keymap.clojure.json" ]; then
+    rm "$ZED_CONFIG/keymap.clojure.json"
+    echo "Removed keymap.clojure.json"
 fi
 
 echo ""
-echo "Uninstall complete. Restart Zed to apply changes."
+echo "Uninstall complete."
+echo ""
+echo "NOTE: If you want to remove Clojure tasks/keybindings from Zed,"
+echo "manually edit ~/.config/zed/tasks.json and keymap.json"
+echo "to remove entries containing 'Clojure:' or 'ClojureScript:'"

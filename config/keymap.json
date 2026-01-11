@@ -1,0 +1,31 @@
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-c s": ["task::Spawn", {"task_name": "Clojure: Check Status"}]
+    }
+  },
+  {
+    "context": "Editor && (extension == clj || extension == cljc || extension == cljs || extension == edn)",
+    "bindings": {
+      "ctrl-x ctrl-e": ["task::Spawn", {"task_name": "Clojure: Eval Selection"}],
+      "ctrl-c ctrl-c": ["task::Spawn", {"task_name": "Clojure: Eval Form at Point"}],
+      "ctrl-c ctrl-k": ["task::Spawn", {"task_name": "Clojure: Eval Buffer"}],
+      "ctrl-c ctrl-n": ["task::Spawn", {"task_name": "Clojure: Reload File"}],
+      "ctrl-c ctrl-t": ["task::Spawn", {"task_name": "Clojure: Run Tests"}],
+      "ctrl-c ctrl-d": ["task::Spawn", {"task_name": "Clojure: Show Documentation"}],
+      "ctrl-c ctrl-s": ["task::Spawn", {"task_name": "Clojure: Show Source"}],
+      "ctrl-c ctrl-a": ["task::Spawn", {"task_name": "Clojure: Apropos"}],
+      "ctrl-c ctrl-e": ["task::Spawn", {"task_name": "Clojure: Last Exception"}],
+      "ctrl-c ctrl-m": ["task::Spawn", {"task_name": "Clojure: Macroexpand"}],
+      "ctrl-c ctrl-o": ["task::Spawn", {"task_name": "Clojure: Start Portal"}],
+      "ctrl-c ctrl-p": ["task::Spawn", {"task_name": "Clojure: Tap to Portal"}]
+    }
+  },
+  {
+    "context": "Editor && extension == cljs",
+    "bindings": {
+      "ctrl-x ctrl-e": ["task::Spawn", {"task_name": "ClojureScript: Eval Selection"}]
+    }
+  }
+]

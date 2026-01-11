@@ -1,0 +1,17 @@
+[
+  {"label": "Clojure: Eval Selection", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh \"$ZED_SELECTED_TEXT\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Eval Form at Point", "command": "~/.zed-clojure-repl/scripts/clj-eval-form.sh \"$ZED_FILE\" \"$ZED_ROW\" \"$ZED_COLUMN\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Eval Buffer", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -f \"$ZED_FILE\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Reload File", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -f \"$ZED_FILE\"", "use_new_terminal": false, "reveal": "no_focus"},
+  {"label": "Clojure: Run Tests", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -t \"$ZED_SYMBOL\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Show Documentation", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -d \"$ZED_SELECTED_TEXT\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Show Source", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -s \"$ZED_SELECTED_TEXT\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Apropos", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -a \"$ZED_SELECTED_TEXT\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Last Exception", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh -e", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Start Portal", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh \"(do (require '[portal.api :as p]) (p/open) (add-tap #'p/submit) :ok)\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Tap to Portal", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh \"(tap> $ZED_SELECTED_TEXT)\"", "use_new_terminal": false, "reveal": "no_focus"},
+  {"label": "Clojure: Check Status", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh --status", "use_new_terminal": false, "reveal": "always"},
+  {"label": "Clojure: Start nREPL", "command": "lein repl :headless", "cwd": "$ZED_WORKTREE_ROOT", "use_new_terminal": true, "reveal": "always"},
+  {"label": "ClojureScript: Eval Selection", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh --cljs \"$ZED_SELECTED_TEXT\"", "use_new_terminal": false, "reveal": "always"},
+  {"label": "ClojureScript: Check Builds", "command": "~/.zed-clojure-repl/scripts/nrepl-eval.sh --cljs-status", "use_new_terminal": false, "reveal": "always"}
+]

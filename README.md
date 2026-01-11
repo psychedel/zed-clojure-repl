@@ -1,6 +1,6 @@
 # Zed Clojure REPL
 
-> ⚠️ **Early Draft** — This is an experimental setup. May require adjustments for your system. Tested on Linux; macOS (OS X) is untested.
+> ⚠️ **Early Draft** — This is an experimental setup. May require adjustments for your system. Tested on Linux only; macOS is untested.
 
 CIDER-like Clojure/ClojureScript development environment for Zed editor.
 

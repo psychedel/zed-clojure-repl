@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# nREPL client for Zed - REPL-driven Clojure development
+# nREPL client for Zed - sends code to running nREPL
 
 set -e
 
-SCRIPT_DIR="$(dirname "$0")"
-PORT=""
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
 
 find_port() {
     local port_type="${1:-clj}"
@@ -21,63 +24,71 @@ find_port() {
     echo ""
 }
 
-# Extract first symbol from expression like "(+ 2 3)" -> "+"
-# Handles multiline input by taking first line only
+check_port_alive() {
+    local port="$1"
+    (nc -z 127.0.0.1 "$port" >/dev/null 2>&1) && return 0
+    return 1
+}
+
 extract_symbol() {
     local input="$1"
     echo "$input" | head -1 | sed 's/^[[:space:]]*[([\{#'\''`~@]*//; s/[[:space:]].*$//'
 }
 
+print_no_repl_error() {
+    echo -e "${RED}Error: No nREPL server found${NC}"
+    echo ""
+    echo "Start the REPL first with Ctrl+C Ctrl+R"
+}
+
 EXPLICIT_PORT=""
 USE_CLJS=false
+USE_TAP=true  # Wrap in tap> by default for visibility in Rebel
 
 while [[ "$1" =~ ^- ]]; do
     case "$1" in
         -p|--port) EXPLICIT_PORT="$2"; shift 2 ;;
         --cljs) USE_CLJS=true; shift ;;
+        --no-tap) USE_TAP=false; shift ;;
         *) break ;;
     esac
 done
 
 [ -n "$EXPLICIT_PORT" ] && PORT="$EXPLICIT_PORT" || { [ "$USE_CLJS" = true ] && PORT=$(find_port cljs) || PORT=$(find_port clj); }
 
-case "$1" in
-    -f|--file) CODE="(load-file \"$2\")" ;;
-    -r|--reload) CODE="(require '[$2] :reload)" ;;
-    -t|--test) CODE="(do (require 'clojure.test) (require '[$2] :reload) (clojure.test/run-tests '$2))" ;;
-    -d|--doc)
-        SYM=$(extract_symbol "$2")
-        CODE="(do (require 'clojure.repl) (clojure.repl/doc $SYM))"
-        ;;
-    -s|--source)
-        SYM=$(extract_symbol "$2")
-        CODE="(do (require 'clojure.repl) (clojure.repl/source $SYM))"
-        ;;
-    -a|--apropos) CODE="(do (require 'clojure.repl) (clojure.repl/apropos \"$2\"))" ;;
-    -e|--pst) CODE="(do (require 'clojure.repl) (clojure.repl/pst))" ;;
-    --dir) CODE="(do (require 'clojure.repl) (clojure.repl/dir $2))" ;;
-    --status) CODE="(println \"nREPL connected. Clojure\" (clojure-version))" ;;
-    --cljs-status) PORT=$(find_port cljs); CODE="(do (require '[shadow.cljs.devtools.api :as shadow]) (println \"Builds:\" (shadow/get-build-ids)))" ;;
-    -h|--help)
-        cat << HELP
-nREPL client for Zed
+# Commands that shouldn't use tap> (they have their own output)
+NO_TAP_COMMANDS=false
 
-Usage:
-  nrepl-eval.sh '<code>'           Evaluate Clojure code
-  nrepl-eval.sh -f <file.clj>      Load file
-  nrepl-eval.sh -r <ns>            Reload namespace
-  nrepl-eval.sh -t <ns>            Run tests
-  nrepl-eval.sh -d <symbol>        Show documentation (extracts symbol from expression)
-  nrepl-eval.sh -s <symbol>        Show source (extracts symbol from expression)
-  nrepl-eval.sh -a <pattern>       Apropos search
-  nrepl-eval.sh -e                 Print last exception
-  nrepl-eval.sh --cljs '<code>'    Eval in shadow-cljs
-HELP
-        exit 0 ;;
+case "$1" in
+    -f|--file) CODE="(load-file \"$2\")"; NO_TAP_COMMANDS=true ;;
+    -r|--reload) CODE="(require '[$2] :reload)"; NO_TAP_COMMANDS=true ;;
+    -t|--test) CODE="(do (require 'clojure.test) (require '[$2] :reload) (clojure.test/run-tests '$2))"; NO_TAP_COMMANDS=true ;;
+    -d|--doc) SYM=$(extract_symbol "$2"); CODE="(do (require 'clojure.repl) (clojure.repl/doc $SYM))"; NO_TAP_COMMANDS=true ;;
+    -s|--source) SYM=$(extract_symbol "$2"); CODE="(do (require 'clojure.repl) (clojure.repl/source $SYM))"; NO_TAP_COMMANDS=true ;;
+    -a|--apropos) CODE="(do (require 'clojure.repl) (clojure.repl/apropos \"$2\"))"; NO_TAP_COMMANDS=true ;;
+    -e|--pst) CODE="(do (require 'clojure.repl) (clojure.repl/pst))"; NO_TAP_COMMANDS=true ;;
+    --dir) CODE="(do (require 'clojure.repl) (clojure.repl/dir $2))"; NO_TAP_COMMANDS=true ;;
+    --status) CODE="(println \"nREPL connected. Clojure\" (clojure-version))"; NO_TAP_COMMANDS=true ;;
+    -h|--help) echo "Usage: nrepl-eval.sh '<code>'"; exit 0 ;;
     *) CODE="$1" ;;
 esac
 
 [ -z "$CODE" ] && echo "Usage: nrepl-eval.sh '<code>'" && exit 1
-[ -z "$PORT" ] && echo "Error: No nREPL. Start with: lein repl :headless" && exit 1
 
-clojure -M "$SCRIPT_DIR/nrepl-client.clj" "$PORT" "$CODE"
+if [ -z "$PORT" ]; then
+    print_no_repl_error
+    exit 1
+fi
+
+if ! check_port_alive "$PORT"; then
+    echo -e "${YELLOW}nREPL port $PORT not responding${NC}"
+    print_no_repl_error
+    exit 1
+fi
+
+# Wrap in tap> for visibility in Rebel REPL (unless it's a special command)
+if [ "$USE_TAP" = true ] && [ "$NO_TAP_COMMANDS" = false ]; then
+    CODE="(tap> (do $CODE))"
+fi
+
+exec clojure -M "$SCRIPT_DIR/nrepl-client.clj" "$PORT" "$CODE"

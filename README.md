@@ -1,25 +1,28 @@
 # Zed Clojure REPL
 
-> ⚠️ **Early draft** — work in progress, expect rough edges
+CIDER-like Clojure/ClojureScript development environment for Zed editor.
 
-Clojure REPL integration for Zed via Tasks — eval, docs, tests, [Portal](https://github.com/djblue/portal).
+![Screenshot](screenshot.png)
+
+## How It Works
+
+1. **Start Rebel REPL** (`Ctrl+C Ctrl+R`) — launches rebel-readline with embedded nREPL server
+2. **Eval code** (`Ctrl+X Ctrl+E`) — sends selected code to nREPL
+3. **See results in Rebel** — eval results appear in REPL via `tap>`, no separate windows
+
+All eval commands share the same nREPL session. The `.nrepl-port` file is created automatically.
 
 ## Features
 
-- **Eval selection** (`Ctrl+X Ctrl+E`)
-- **Eval form at point** (`Ctrl+C Ctrl+C`)
-- **Eval buffer** (`Ctrl+C Ctrl+K`)
-- **Reload namespace** (`Ctrl+C Ctrl+N`)
-- **Run tests** (`Ctrl+C Ctrl+T`)
-- **Documentation lookup** (`Ctrl+C Ctrl+D`) — works with full expressions
-- **[Portal](https://github.com/djblue/portal) data inspector** integration
-- **ClojureScript** support (shadow-cljs)
+- **Auto-start nREPL** — Rebel REPL starts embedded nREPL if none running
+- **Results in REPL** — eval results appear in Rebel via tap>
+- **Rich REPL** — rebel-readline with TAB completion, syntax highlighting, history
+- **ClojureScript** — shadow-cljs support (parallel to Clojure REPL)
 
 ## Requirements
 
 - [Zed editor](https://zed.dev)
 - [Clojure CLI](https://clojure.org/guides/install_clojure)
-- Running nREPL server
 
 ## Installation
 
@@ -31,69 +34,41 @@ cd zed-clojure-repl
 
 Restart Zed after installation.
 
-## Usage
+## Quick Start
 
-1. Start nREPL in your project:
-   ```bash
-   # Leiningen
-   lein repl :headless
-
-   # Clojure CLI (requires nREPL dependency in deps.edn)
-   clj -M:nrepl
-   ```
-
-2. Open your project in Zed
-
-3. Use keyboard shortcuts or run `Ctrl+Shift+P` → type "Clojure:"
+1. Open any `.clj` file in Zed
+2. Press `Ctrl+C Ctrl+R` — starts Rebel REPL with nREPL
+3. Select code, press `Ctrl+X Ctrl+E` — result appears in Rebel
 
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
+| `Ctrl+C Ctrl+R` | Start Rebel REPL (auto-starts nREPL) |
 | `Ctrl+X Ctrl+E` | Eval selection |
 | `Ctrl+C Ctrl+C` | Eval form at point |
 | `Ctrl+C Ctrl+K` | Eval buffer |
-| `Ctrl+C Ctrl+N` | Reload file |
+| `Ctrl+C Ctrl+N` | Reload namespace |
 | `Ctrl+C Ctrl+T` | Run tests |
 | `Ctrl+C Ctrl+D` | Documentation |
 | `Ctrl+C Ctrl+S` | Show source |
-| `Ctrl+C Ctrl+A` | Apropos (search symbols) |
 | `Ctrl+C Ctrl+E` | Last exception |
-| `Ctrl+C Ctrl+M` | Macroexpand |
-| `Ctrl+C Ctrl+O` | Open Portal |
-| `Ctrl+C Ctrl+P` | Tap to Portal |
-| `Ctrl+C S` | Check nREPL status |
-
-## Portal Integration
-
-Add [Portal](https://github.com/djblue/portal) to your project:
-
-```clojure
-;; deps.edn
-{:deps {djblue/portal {:mvn/version "0.58.2"}}}
-
-;; project.clj
-[djblue/portal "0.58.2"]
-```
-
-Press `Ctrl+C Ctrl+O` to open Portal, then `Ctrl+C Ctrl+P` to send selected data.
 
 ## ClojureScript
 
-For `.cljs` files, evaluation uses shadow-cljs nREPL:
+Start shadow-cljs separately:
 
 ```bash
 npx shadow-cljs watch app
 ```
 
+Then `Ctrl+C Ctrl+J` connects to shadow-cljs REPL.
+
 ## Uninstall
 
 ```bash
-cd zed-clojure-repl
 ./uninstall.sh
 ```
-
-Then manually remove Clojure entries from `~/.config/zed/tasks.json` and `keymap.json`.
 
 ## License
 

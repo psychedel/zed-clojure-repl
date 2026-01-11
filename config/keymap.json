@@ -2,7 +2,8 @@
   {
     "context": "Workspace",
     "bindings": {
-      "ctrl-c s": ["task::Spawn", {"task_name": "Clojure: Check Status"}]
+      "ctrl-c s": ["task::Spawn", {"task_name": "Clojure: Check Status"}],
+      "ctrl-c ctrl-r": ["task::Spawn", {"task_name": "Clojure: Start Rebel REPL"}]
     }
   },
   {
